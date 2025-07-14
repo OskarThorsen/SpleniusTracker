@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v44 (Date Axis Fix)</title>
+    <title>SpleniusTracker v45 (Mobile UI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- IMPROVEMENT: Added a second font for headings for better visual hierarchy -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -18,23 +17,22 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-                        // IMPROVEMENT: Defined a new font family for headings
                         heading: ['Lexend', 'sans-serif'],
                     },
                     colors: {
-                        'jet-black': '#0A0A0A', // Slightly darker black
-                        'panel-dark': '#151518', // Softer panel color
+                        'jet-black': '#0A0A0A',
+                        'panel-dark': '#151518',
                         'panel-light': '#FFFFFF',
                         'accent-yellow': '#FFD100',
                         'accent-yellow-hover': '#FFC300',
                         'info-blue': '#3E85FF',
                         'success-green': '#32D74B',
                         'alert-red': '#FF3B30',
-                        'text-primary-dark': '#F0F0F0', // Softer white
+                        'text-primary-dark': '#F0F0F0',
                         'text-secondary-dark': '#A1A1A6',
                         'text-primary-light': '#0B0C0F',
                         'text-secondary-light': '#6A6A6E',
-                        'border-dark': '#2A2A2E', // Softer border
+                        'border-dark': '#2A2A2E',
                     },
                     fontSize: {
                         'display-l': ['48px', '52px'],
@@ -49,7 +47,6 @@
                         'glow-blue': '0 0 15px 0 rgba(62, 133, 255, 0.25)',
                         'glow-red': '0 0 15px 0 rgba(255, 59, 48, 0.25)',
                     },
-                    // IMPROVEMENT: Added keyframes for new animations
                     keyframes: {
                         fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
                         fadeInSlideUp: { '0%': { opacity: 0, transform: 'translateY(15px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
@@ -80,17 +77,31 @@
         input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); box-shadow: 0 0 10px 0 rgba(255, 209, 0, 0.3); }
         input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; background: #FFFFFF; border: 2px solid #FFD100; border-radius: 50%; cursor: pointer; }
 
-        /* IMPROVEMENT: Added a subtle background pattern */
         body { background-image: radial-gradient(#151518 1px, transparent 1px); background-size: 20px 20px; }
         .bg-panel-dark { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: rgba(21, 21, 24, 0.7); border: 1px solid #2A2A2E; }
         
-        /* IMPROVEMENT: Added styles for the new modal */
         #modal-backdrop { transition: opacity 0.3s ease-in-out; }
         #modal-content { animation: modalShow 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
         Chart.defaults.color = '#A1A1A6';
         Chart.defaults.borderColor = '#2A2A2E';
         Chart.defaults.font.family = "Inter, sans-serif";
+
+        /* IMPROVEMENT: Responsive sidebar styles */
+        @media (max-width: 768px) {
+            #sidebar.collapsed {
+                width: 80px; /* Width for icon-only sidebar */
+            }
+            #sidebar.collapsed .sidebar-text, #sidebar.collapsed .sidebar-header-text {
+                display: none;
+            }
+            #sidebar.collapsed .nav-button, #sidebar.collapsed #sidebar-new-session-btn {
+                justify-content: center;
+            }
+             #sidebar.collapsed #logout-btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body class="bg-jet-black text-text-primary-dark font-sans h-screen overflow-hidden">
@@ -131,46 +142,58 @@
     </div>
 
     <!-- Main App View -->
-    <div id="app-view" class="w-full h-full hidden flex">
-        <aside class="bg-panel-dark w-64 p-4 flex flex-col flex-shrink-0">
+    <div id="app-view" class="w-full h-full hidden md:flex">
+        <!-- IMPROVEMENT: Sidebar now responsive. Added ID 'sidebar' -->
+        <aside id="sidebar" class="bg-panel-dark w-64 md:w-64 p-4 flex flex-col flex-shrink-0 transition-all duration-300">
             <div class="flex items-center gap-3 p-4">
-                <svg class="w-8 h-8 text-accent-yellow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
-                <span class="font-heading text-xl font-semibold text-text-primary-dark">SpleniusTracker</span>
+                <svg class="w-8 h-8 text-accent-yellow flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
+                <span class="sidebar-header-text font-heading text-xl font-semibold text-text-primary-dark">SpleniusTracker</span>
             </div>
             
             <div class="mt-4 mb-4 px-2">
                 <button id="sidebar-new-session-btn" class="w-full flex items-center justify-center gap-2 bg-accent-yellow text-jet-black font-semibold py-3 px-4 rounded-lg hover:bg-accent-yellow-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel-dark focus:ring-accent-yellow transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Ny Økt</span>
+                    <svg class="w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span class="sidebar-text">Ny Økt</span>
                 </button>
             </div>
 
             <nav class="flex flex-col gap-2 flex-grow px-2">
                 <button id="nav-dashboard" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span>Dashboard</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span class="sidebar-text">Dashboard</span>
                 </button>
                 <button id="nav-historikk" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
-                    <span>Historikk</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                    <span class="sidebar-text">Historikk</span>
                 </button>
             </nav>
             <div class="p-2">
                 <button id="logout-btn" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg text-base text-text-secondary-dark hover:bg-alert-red/10 hover:text-alert-red transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    <span>Logg ut</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span class="sidebar-text">Logg ut</span>
                 </button>
             </div>
         </aside>
 
-        <main class="main-content flex-grow p-8 overflow-y-auto">
-            <div id="dashboard" class="view animate-fadeIn"></div>
-            <div id="logg-behandling" class="view animate-fadeIn"></div>
-            <div id="historikk" class="view animate-fadeIn"></div>
-        </main>
+        <div class="flex-grow flex flex-col">
+             <!-- IMPROVEMENT: Added mobile header with hamburger menu -->
+             <header class="md:hidden bg-panel-dark p-4 flex justify-between items-center">
+                 <h1 class="font-heading text-xl font-bold text-text-primary-dark">Dashboard</h1>
+                 <button id="menu-toggle-btn" class="p-2">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                     </svg>
+                 </button>
+             </header>
+            <main class="main-content flex-grow p-4 md:p-8 overflow-y-auto">
+                <div id="dashboard" class="view animate-fadeIn"></div>
+                <div id="logg-behandling" class="view animate-fadeIn"></div>
+                <div id="historikk" class="view animate-fadeIn"></div>
+            </main>
+        </div>
     </div>
 
-    <!-- IMPROVEMENT: Added a reusable modal for confirmations -->
+    <!-- Reusable modal for confirmations -->
     <div id="modal-backdrop" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
         <div id="modal-content" class="bg-panel-dark rounded-2xl p-8 max-w-md w-full shadow-2xl">
             <h2 id="modal-title" class="font-heading text-xl font-bold text-text-primary-dark mb-2">Bekreftelse</h2>
@@ -212,12 +235,35 @@
         const appView = document.getElementById('app-view');
         const loginForm = document.getElementById('login-form');
         const authError = document.getElementById('auth-error');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+
+        // --- MOBILE SIDEBAR LOGIC ---
+        const setupMobileSidebar = () => {
+             if (window.innerWidth <= 768) {
+                sidebar.classList.add('collapsed');
+                appView.classList.remove('md:flex'); // Use flex for mobile layout
+                appView.classList.add('flex');
+            } else {
+                sidebar.classList.remove('collapsed');
+                appView.classList.add('md:flex');
+            }
+        };
+
+        menuToggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        window.addEventListener('resize', setupMobileSidebar);
+        // --- END MOBILE SIDEBAR LOGIC ---
+
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 loginView.classList.add('hidden');
                 appView.classList.remove('hidden');
+                setupMobileSidebar(); // Setup sidebar on login
                 showView('dashboard'); 
             } else {
                 currentUser = null;
@@ -289,7 +335,7 @@
             if (activeViewId === 'historikk') updateHistory(data);
         }
 
-        const viewToNavButtonMap = { 'dashboard': 'nav-dashboard', 'historikk': 'nav-historikk' };
+        const viewToNavButtonMap = { 'dashboard': 'nav-dashboard', 'historikk': 'nav-historikk', 'logg-behandling': 'sidebar-new-session-btn' };
         function showView(viewId) {
             document.querySelectorAll('#app-view .view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId)?.classList.add('active');
@@ -298,12 +344,31 @@
                 b.classList.remove('bg-accent-yellow', 'text-jet-black', 'font-semibold');
                 b.classList.add('text-text-secondary-dark');
             });
+            // Also reset new session button style
+             document.getElementById('sidebar-new-session-btn').classList.remove('ring-2', 'ring-offset-2', 'ring-accent-yellow');
+
 
             const activeNavButtonId = viewToNavButtonMap[viewId];
             if (activeNavButtonId) {
                 const activeButton = document.getElementById(activeNavButtonId);
-                activeButton?.classList.add('bg-accent-yellow', 'text-jet-black', 'font-semibold');
-                activeButton?.classList.remove('text-text-secondary-dark');
+                if(activeNavButtonId !== 'sidebar-new-session-btn') {
+                    activeButton?.classList.add('bg-accent-yellow', 'text-jet-black', 'font-semibold');
+                    activeButton?.classList.remove('text-text-secondary-dark');
+                } else {
+                    // Special style for the main CTA button if it's the active "view"
+                    activeButton?.classList.add('ring-2', 'ring-offset-2', 'ring-offset-panel-dark', 'ring-accent-yellow');
+                }
+            }
+            
+            // Update mobile header text
+            const mobileHeader = document.querySelector('header h1');
+            if(mobileHeader) {
+                const viewTitles = {
+                    'dashboard': 'Dashboard',
+                    'historikk': 'Historikk',
+                    'logg-behandling': 'Ny Økt'
+                };
+                mobileHeader.textContent = viewTitles[viewId] || 'SpleniusTracker';
             }
 
             if (currentUser) listenToBehandlinger();
@@ -311,6 +376,11 @@
             if (viewId === 'logg-behandling') prepareForm('logg-behandling');
             else if (viewId === 'dashboard') prepareForm('dashboard');
             else if (viewId === 'historikk') prepareForm('historikk');
+
+            // Collapse sidebar on mobile after navigation
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('collapsed');
+            }
         };
         
         document.getElementById('nav-dashboard').addEventListener('click', () => showView('dashboard'));
@@ -323,18 +393,18 @@
 
             if (viewId === 'dashboard') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-2">Dashboard</h1>
-                    <p class="text-body-s text-text-secondary-dark mb-8">En oversikt over fremgang og innsikt.</p>
+                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-2 hidden md:block">Dashboard</h1>
+                    <p class="text-body-s text-text-secondary-dark mb-8 hidden md:block">En oversikt over fremgang og innsikt.</p>
                     <div id="dashboard-header" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"></div>
                     <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>`;
             } else if (viewId === 'logg-behandling') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8">Loggfør Ny Økt</h1>
-                    <form id="behandling-skjema" class="bg-panel-dark p-8 rounded-2xl max-w-4xl mx-auto"></form>`;
+                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8 hidden md:block">Loggfør Ny Økt</h1>
+                    <form id="behandling-skjema" class="bg-panel-dark p-4 md:p-8 rounded-2xl max-w-4xl mx-auto"></form>`;
                 renderFormContent();
             } else if (viewId === 'historikk') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8">Økthistorikk</h1>
+                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8 hidden md:block">Økthistorikk</h1>
                     <div id="historikk-liste" class="space-y-4"></div>`;
             }
         }
@@ -349,9 +419,9 @@
             if (!data || data.length === 0) {
                  header.innerHTML = "";
                  grid.innerHTML = `<div class="bg-panel-dark p-8 rounded-2xl text-center col-span-full animate-fadeInSlideUp">
-                                      <h2 class="font-heading text-xl font-semibold mb-2">Velkommen til SpleniusTracker!</h2>
-                                      <p class="text-body-s text-text-secondary-dark mb-6">Du har ingen loggførte økter enda. Start med å legge til din første.</p>
-                                      <button id="empty-dashboard-new-session-btn" class="bg-accent-yellow text-jet-black font-semibold py-3 px-6 rounded-lg hover:bg-accent-yellow-hover transition-all">Start Første Økt</button>
+                                     <h2 class="font-heading text-xl font-semibold mb-2">Velkommen til SpleniusTracker!</h2>
+                                     <p class="text-body-s text-text-secondary-dark mb-6">Du har ingen loggførte økter enda. Start med å legge til din første.</p>
+                                     <button id="empty-dashboard-new-session-btn" class="bg-accent-yellow text-jet-black font-semibold py-3 px-6 rounded-lg hover:bg-accent-yellow-hover transition-all">Start Første Økt</button>
                                    </div>`;
                  document.getElementById('empty-dashboard-new-session-btn')?.addEventListener('click', () => showView('logg-behandling'));
                  return;
@@ -384,7 +454,7 @@
             header.innerHTML = `
                 <div class="bg-panel-dark p-6 rounded-2xl animate-fadeInSlideUp"><div class="text-body-s text-text-secondary-dark">Totalt Antall Økter</div><div class="font-heading text-display-l font-bold text-text-primary-dark mt-2">${totalSessions}</div></div>
                 <div class="bg-panel-dark p-6 rounded-2xl animate-fadeInSlideUp" style="animation-delay: 50ms;"><div class="text-body-s text-text-secondary-dark">Total Tid Behandlet</div><div class="font-heading text-display-l font-bold text-text-primary-dark mt-2">${totalDurationFormatted}</div></div>
-                <div id="dashboard-new-session-card" class="bg-accent-yellow p-6 rounded-2xl animate-fadeInSlideUp flex flex-col justify-center items-center text-jet-black hover:bg-accent-yellow-hover transition-colors cursor-pointer shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20" style="animation-delay: 100ms;"><svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg><div class="font-heading text-title-m font-semibold mt-2">Ny Behandling</div></div>`;
+                <div id="dashboard-new-session-card" class="bg-accent-yellow p-6 rounded-2xl animate-fadeInSlideUp flex-col justify-center items-center text-jet-black hover:bg-accent-yellow-hover transition-colors cursor-pointer shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20 hidden md:flex" style="animation-delay: 100ms;"><svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg><div class="font-heading text-title-m font-semibold mt-2">Ny Behandling</div></div>`;
              document.getElementById('dashboard-new-session-card')?.addEventListener('click', () => showView('logg-behandling'));
         };
         
@@ -459,7 +529,6 @@
             responsive: true, 
             maintainAspectRatio: false, 
             scales: { 
-                // FIX: Updated x-axis configuration to properly display date labels
                 x: { 
                     type: 'time', 
                     time: { 
@@ -506,7 +575,6 @@
                 responsive: true, 
                 maintainAspectRatio: false, 
                 scales: { 
-                    // FIX: Updated x-axis configuration for consistency
                     x: { 
                         type: 'time', 
                         time: { 
@@ -650,10 +718,10 @@
                             <button data-delete-id="${okt.id}" class="delete-btn text-text-secondary-dark hover:text-alert-red transition-colors p-2 -mr-2 -mt-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                         </div>
                         <div class="mt-4 pt-4 border-t border-border-dark grid grid-cols-2 gap-x-4 gap-y-2 text-body-s">
-                           <div>Smerte: <span class="font-semibold text-text-primary-dark">${okt.pre.pain_level} → ${okt.post.pain_level}</span></div>
-                           <div>Spenning: <span class="font-semibold text-text-primary-dark">${okt.pre.tightness_level} → ${okt.post.tightness_level}</span></div>
-                           <div class="col-span-2">Fokus: <span class="font-semibold text-text-primary-dark">${okt.focus_areas.join(', ') || 'N/A'}</span></div>
-                           <div>Intensitet: <span class="font-semibold text-text-primary-dark">${okt.intensity}/5</span></div>
+                            <div>Smerte: <span class="font-semibold text-text-primary-dark">${okt.pre.pain_level} → ${okt.post.pain_level}</span></div>
+                            <div>Spenning: <span class="font-semibold text-text-primary-dark">${okt.pre.tightness_level} → ${okt.post.tightness_level}</span></div>
+                            <div class="col-span-2">Fokus: <span class="font-semibold text-text-primary-dark">${okt.focus_areas.join(', ') || 'N/A'}</span></div>
+                            <div>Intensitet: <span class="font-semibold text-text-primary-dark">${okt.intensity}/5</span></div>
                         </div>
                         ${okt.pre.had_migraine && okt.pre.last_migraine_date ? `<div class="mt-2 pt-2 border-t border-border-dark text-body-s text-info-blue"><strong>Migreneanfall:</strong> ${dateFns.format(new Date(okt.pre.last_migraine_date), 'd. MMM')} (Styrke: ${okt.pre.last_migraine_severity})</div>` : ''}
                     </div>`;
