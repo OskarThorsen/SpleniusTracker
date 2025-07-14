@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v54 (Mobile-Friendly UI)</title>
+    <title>SpleniusTracker v55 (API Key Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,25 +200,6 @@
             getDoc 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase Configuration ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config)
-            : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // --- Initialize Firebase ---
-        let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (error) {
-            console.error("Firebase initialization failed:", error);
-            document.getElementById('auth-error').textContent = "Kritisk feil: Kunne ikke koble til Firebase.";
-            document.getElementById('auth-error').classList.remove('hidden');
-        }
-
         // --- DOM Element References ---
         const loginView = document.getElementById('login-view');
         const appView = document.getElementById('app-view');
@@ -235,24 +216,113 @@
         
         let painChart = null;
 
-        // --- Main App Logic ---
-        if (auth) {
+        // --- Utility Functions ---
+        function showAuthError(message) {
+            authErrorDiv.innerHTML = message;
+            authErrorDiv.classList.remove('hidden');
+        }
+        function hideAuthError() {
+            authErrorDiv.classList.add('hidden');
+        }
+        function getFriendlyAuthError(errorCode) {
+            console.log("Caught auth error code:", errorCode);
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return 'Ugyldig e-postadresseformat.';
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential':
+                    return 'Feil e-post eller passord.';
+                case 'auth/email-already-in-use':
+                    return 'Denne e-postadressen er allerede registrert.';
+                case 'auth/weak-password':
+                    return 'Passordet er for svakt. Bruk minst 6 tegn.';
+                case 'auth/operation-not-allowed':
+                     return `<b>Påloggingstypen er ikke aktivert.</b><br>For å fikse dette, må eieren av Firebase-prosjektet:<br>1. Gå til Firebase-konsollen.<br>2. Gå til Authentication -> Sign-in method.<br>3. Aktiver både "Email/Password" og "Anonymous" som påloggingsmetoder.`;
+                case 'auth/invalid-api-key':
+                case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+                     return `<b>Ugyldig API-nøkkel.</b><br>Appen bruker en feil eller manglende nøkkel for å koble til Firebase. Dette skjer vanligvis hvis appens konfigurasjon ikke er riktig satt opp i hosting-miljøet.`;
+                default:
+                    return `En ukjent feil oppstod (${errorCode}). Prøv igjen.`;
+            }
+        }
+
+        // --- Firebase Initialization and Main Logic ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config)
+            : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Immediately check for placeholder API key
+        if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+            showAuthError("<b>Kritisk konfigurasjonsfeil:</b> Firebase API-nøkkel mangler. Appen kan ikke koble til databasen. Dette må fikses i hosting-miljøet.");
+        } else {
+            let app, auth, db;
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // Setup listeners only if initialization is successful
+                setupAuthListeners(auth, db);
+                initialAuth(auth);
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                showAuthError("Kritisk feil: Kunne ikke koble til Firebase. Sjekk konsollen for detaljer.");
+            }
+        }
+
+        function setupAuthListeners(auth, db) {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // User is signed in
                     appView.classList.add('active');
                     loginView.classList.remove('active');
-                    await setupUserInfo(user);
+                    await setupUserInfo(user, db);
                     setupDashboard();
                 } else {
-                    // User is signed out
                     loginView.classList.add('active');
                     appView.classList.remove('active');
                 }
             });
+
+            signupBtn.addEventListener('click', async () => {
+                const name = nameInput.value.trim();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                if (!name || !email || password.length < 6) {
+                    showAuthError("Fyll ut alle felt. Passord må være minst 6 tegn.");
+                    return;
+                }
+                try {
+                    hideAuthError();
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, 'artifacts', appId, 'users', userCredential.user.uid), { name, email, createdAt: new Date() });
+                } catch (error) {
+                    showAuthError(getFriendlyAuthError(error.code));
+                }
+            });
+
+            loginBtn.addEventListener('click', async () => {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                if (!email || !password) {
+                    showAuthError("Fyll ut e-post og passord.");
+                    return;
+                }
+                try {
+                    hideAuthError();
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    showAuthError(getFriendlyAuthError(error.code));
+                }
+            });
+            
+            logoutBtn.addEventListener('click', () => signOut(auth));
         }
         
-        async function setupUserInfo(user) {
+        async function setupUserInfo(user, db) {
             const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid);
             const userDocSnap = await getDoc(userDocRef);
             if (userDocSnap.exists()) {
@@ -268,13 +338,11 @@
         }
 
         function setupDashboard() {
-            // Only create chart if it doesn't exist
             if (painChart) {
                 painChart.destroy();
             }
             const ctx = document.getElementById('painChart').getContext('2d');
             
-            // Sample data
             const labels = Array.from({length: 7}, (_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
@@ -306,83 +374,18 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10,
-                            grid: { color: '#2A2A2E' },
-                        },
-                        x: {
-                            type: 'time',
-                            time: { unit: 'day', displayFormats: { day: 'd MMM' } },
-                            grid: { display: false },
-                        }
+                        y: { beginAtZero: true, max: 10, grid: { color: '#2A2A2E' } },
+                        x: { type: 'time', time: { unit: 'day', displayFormats: { day: 'd MMM' } }, grid: { display: false } }
                     },
                     plugins: {
                         legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0A0A0A',
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 12 },
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: false,
-                        }
+                        tooltip: { backgroundColor: '#0A0A0A', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 12 }, padding: 12, cornerRadius: 8, displayColors: false }
                     }
                 }
             });
         }
-
-        // --- Event Listeners ---
-        signupBtn.addEventListener('click', async () => {
-            const name = nameInput.value.trim();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            if (!name || !email || password.length < 6) {
-                showAuthError("Fyll ut alle felt. Passord må være minst 6 tegn.");
-                return;
-            }
-            try {
-                hideAuthError();
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid), { name, email, createdAt: new Date() });
-            } catch (error) {
-                showAuthError(getFriendlyAuthError(error.code));
-            }
-        });
-
-        loginBtn.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            if (!email || !password) {
-                showAuthError("Fyll ut e-post og passord.");
-                return;
-            }
-            try {
-                hideAuthError();
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showAuthError(getFriendlyAuthError(error.code));
-            }
-        });
         
-        logoutBtn.addEventListener('click', () => signOut(auth));
-
-        // --- Utility Functions ---
-        function showAuthError(message) {
-            authErrorDiv.innerHTML = message;
-            authErrorDiv.classList.remove('hidden');
-        }
-        function hideAuthError() {
-            authErrorDiv.classList.add('hidden');
-        }
-        function getFriendlyAuthError(errorCode) {
-            // ... (error messages as before)
-            return `En feil oppstod (${errorCode}). Prøv igjen.`;
-        }
-        
-        // --- Initial Authentication Flow ---
-        async function initialAuth() {
+        async function initialAuth(auth) {
             if (!auth || auth.currentUser) return;
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -395,9 +398,6 @@
                 showAuthError(getFriendlyAuthError(error.code));
             }
         }
-
-        initialAuth();
-
     </script>
 </body>
 </html>
