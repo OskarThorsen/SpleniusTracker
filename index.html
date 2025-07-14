@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v51 (Scrolling Fix)</title>
+    <title>SpleniusTracker v52 (Final Scrolling Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,8 +87,10 @@
         Chart.defaults.borderColor = '#2A2A2E';
         Chart.defaults.font.family = "Inter, sans-serif";
 
-        /* FIX: Class to prevent body scrolling when the app is active */
-        .no-scroll {
+        /* FIX: More robust scroll lock for html and body */
+        html.no-scroll,
+        body.no-scroll {
+            height: 100%;
             overflow: hidden;
         }
     </style>
@@ -233,7 +235,8 @@
                 currentUser = user;
                 loginView.style.display = 'none';
                 appView.style.display = 'flex';
-                // FIX: Add no-scroll class to body when logged in to prevent double scrollbars
+                // FIX: Apply scroll lock to html and body
+                document.documentElement.classList.add('no-scroll');
                 document.body.classList.add('no-scroll');
                 showView('dashboard'); 
             } else {
@@ -244,7 +247,8 @@
                 }
                 loginView.style.display = 'grid';
                 appView.style.display = 'none';
-                // FIX: Remove no-scroll class from body when logged out
+                // FIX: Remove scroll lock from html and body
+                document.documentElement.classList.remove('no-scroll');
                 document.body.classList.remove('no-scroll');
             }
         });
@@ -785,4 +789,4 @@
 
     </script>
 </body>
-</html>
+</ht
