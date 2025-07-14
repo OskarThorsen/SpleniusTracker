@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v50 (Best Streak Added)</title>
+    <title>SpleniusTracker v51 (Scrolling Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,6 +86,11 @@
         Chart.defaults.color = '#A1A1A6';
         Chart.defaults.borderColor = '#2A2A2E';
         Chart.defaults.font.family = "Inter, sans-serif";
+
+        /* FIX: Class to prevent body scrolling when the app is active */
+        .no-scroll {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-jet-black text-text-primary-dark font-sans">
@@ -124,7 +129,7 @@
         </div>
     </div>
 
-    <div id="app-view" class="w-full h-screen hidden flex flex-col md:flex-row overflow-hidden">
+    <div id="app-view" class="w-full h-screen hidden flex flex-col md:flex-row">
         <aside id="sidebar" class="bg-panel-dark w-64 p-4 hidden md:flex flex-col flex-shrink-0 border-r border-border-dark">
             <div class="flex items-center gap-3 p-4">
                 <svg class="w-8 h-8 text-accent-yellow flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
@@ -228,6 +233,8 @@
                 currentUser = user;
                 loginView.style.display = 'none';
                 appView.style.display = 'flex';
+                // FIX: Add no-scroll class to body when logged in to prevent double scrollbars
+                document.body.classList.add('no-scroll');
                 showView('dashboard'); 
             } else {
                 currentUser = null;
@@ -237,6 +244,8 @@
                 }
                 loginView.style.display = 'grid';
                 appView.style.display = 'none';
+                // FIX: Remove no-scroll class from body when logged out
+                document.body.classList.remove('no-scroll');
             }
         });
         
@@ -438,7 +447,6 @@
             container.innerHTML = ranked.map(r => `<div><div class="flex justify-between items-center mb-1"><span class="text-body-s font-semibold text-text-primary-dark">${r.area}</span><span class="text-body-s font-medium text-text-secondary-dark">${r.percentage.toFixed(0)}%</span></div><div class="w-full bg-border-dark rounded-full h-2"><div class="bg-accent-yellow h-2 rounded-full" style="width: ${r.percentage}%"></div></div></div>`).join('');
         };
 
-        // IMPROVEMENT: Function now calculates and displays both current and best streak.
         const renderMigraineStreakCard = (data) => {
             const container = document.getElementById('migraineStreakCard');
             if (!container) return;
