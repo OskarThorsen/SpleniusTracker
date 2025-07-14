@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v53 (Robust Scrolling Fix)</title>
+    <title>SpleniusTracker v56 (Layout Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,36 +67,44 @@
 
         .font-heading { font-family: 'Lexend', sans-serif; }
 
+        /* Custom scrollbar for main content area */
         .main-content::-webkit-scrollbar { width: 8px; }
         .main-content::-webkit-scrollbar-track { background: transparent; }
         .main-content::-webkit-scrollbar-thumb { background-color: #2A2A2E; border-radius: 4px; }
         
+        /* Custom range slider styles */
         input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: #2A2A2E; border-radius: 3px; outline: none; transition: background 0.2s; }
         input[type="range"]:hover { background: #3f3f46; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: #FFFFFF; border: 2px solid #FFD100; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); box-shadow: 0 0 10px 0 rgba(255, 209, 0, 0.3); }
         input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; background: #FFFFFF; border: 2px solid #FFD100; border-radius: 50%; cursor: pointer; }
 
+        /* Background pattern */
         body { background-image: radial-gradient(#151518 1px, transparent 1px); background-size: 20px 20px; }
         .bg-panel-dark { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: rgba(21, 21, 24, 0.8); }
         
+        /* Modal styles */
         #modal-backdrop { transition: opacity 0.3s ease-in-out; }
         #modal-content { animation: modalShow 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
+        /* Chart.js defaults */
         Chart.defaults.color = '#A1A1A6';
         Chart.defaults.borderColor = '#2A2A2E';
         Chart.defaults.font.family = "Inter, sans-serif";
 
-        html.no-scroll,
-        body.no-scroll {
-            height: 100%;
+        /* Prevent body scroll when app view is active */
+        html.app-active,
+        body.app-active {
             overflow: hidden;
+            height: 100vh;
         }
     </style>
 </head>
 <body class="bg-jet-black text-text-primary-dark font-sans">
     
+    <!-- Login View -->
     <div id="login-view" class="w-full min-h-screen grid grid-cols-1 md:grid-cols-2">
+        <!-- Desktop Branding Panel -->
         <div class="hidden md:flex flex-col justify-center items-center bg-panel-dark p-12 text-center border-r border-border-dark">
              <svg class="w-24 h-24 mb-6 text-accent-yellow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
             <h1 class="font-heading text-5xl font-bold mb-3 text-text-primary-dark">SpleniusTracker</h1>
@@ -105,8 +113,10 @@
             </p>
         </div>
 
+        <!-- Login Form -->
         <div class="w-full min-h-screen flex flex-col justify-center items-center bg-jet-black p-6 sm:p-8">
             <div class="w-full max-w-sm">
+                <!-- Mobile Branding -->
                 <div class="text-center mb-8 md:hidden">
                     <svg class="w-16 h-16 mx-auto text-accent-yellow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
                     <h1 class="font-heading text-3xl font-bold text-text-primary-dark mt-2">SpleniusTracker</h1>
@@ -130,70 +140,73 @@
         </div>
     </div>
 
-    <!-- FIX: Restructured app view for robust scrolling -->
-    <div id="app-view" class="w-full h-screen hidden flex flex-col md:flex-row">
-        <!-- Desktop Sidebar -->
-        <aside id="sidebar" class="bg-panel-dark w-64 p-4 hidden md:flex flex-col flex-shrink-0 border-r border-border-dark">
-            <div class="flex items-center gap-3 p-4">
-                <svg class="w-8 h-8 text-accent-yellow flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
-                <span class="font-heading text-xl font-semibold text-text-primary-dark">SpleniusTracker</span>
-            </div>
-            
-            <div class="mt-4 mb-4 px-2">
-                <button id="sidebar-new-session-btn" class="w-full flex items-center justify-start gap-3 bg-accent-yellow text-jet-black font-semibold py-3 px-4 rounded-lg hover:bg-accent-yellow-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel-dark focus:ring-accent-yellow transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">
-                    <svg class="w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>Ny Økt</span>
-                </button>
-            </div>
+    <!-- Main Application View -->
+    <div id="app-view" class="w-full h-screen hidden flex flex-col">
+        <!-- Main container for sidebar and content -->
+        <div class="flex flex-grow w-full overflow-hidden">
+            <!-- Desktop Sidebar -->
+            <aside id="sidebar" class="bg-panel-dark w-64 p-4 hidden md:flex flex-col flex-shrink-0 border-r border-border-dark">
+                <div class="flex items-center gap-3 p-4">
+                    <svg class="w-8 h-8 text-accent-yellow flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
+                    <span class="font-heading text-xl font-semibold text-text-primary-dark">SpleniusTracker</span>
+                </div>
+                
+                <div class="mt-4 mb-4 px-2">
+                    <button id="sidebar-new-session-btn" class="w-full flex items-center justify-start gap-3 bg-accent-yellow text-jet-black font-semibold py-3 px-4 rounded-lg hover:bg-accent-yellow-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel-dark focus:ring-accent-yellow transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">
+                        <svg class="w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Ny Økt</span>
+                    </button>
+                </div>
 
-            <nav class="flex flex-col gap-2 flex-grow px-2">
-                <button id="nav-dashboard" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span>Dashboard</span>
-                </button>
-                <button id="nav-historikk" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
-                    <span>Historikk</span>
-                </button>
-            </nav>
-            <div class="p-2">
-                <button id="logout-btn" class="flex items-center justify-start gap-3 w-full px-4 py-3 rounded-lg text-base text-text-secondary-dark hover:bg-alert-red/10 hover:text-alert-red transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    <span>Logg ut</span>
-                </button>
-            </div>
-        </aside>
+                <nav class="flex flex-col gap-2 flex-grow px-2">
+                    <button id="nav-dashboard" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span>Dashboard</span>
+                    </button>
+                    <button id="nav-historikk" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                        <span>Historikk</span>
+                    </button>
+                </nav>
+                <div class="p-2">
+                    <button id="logout-btn" class="flex items-center justify-start gap-3 w-full px-4 py-3 rounded-lg text-base text-text-secondary-dark hover:bg-alert-red/10 hover:text-alert-red transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <span>Logg ut</span>
+                    </button>
+                </div>
+            </aside>
 
-        <!-- FIX: New wrapper for main content and mobile nav to handle layout correctly -->
-        <div class="flex flex-col flex-grow w-full md:w-auto overflow-hidden">
-            <!-- Main content area now correctly scrolls within its container -->
-            <main class="main-content flex-grow p-4 md:p-8 overflow-y-auto">
-                <div id="dashboard" class="view animate-fadeIn"></div>
-                <div id="logg-behandling" class="view animate-fadeIn"></div>
-                <div id="historikk" class="view animate-fadeIn"></div>
+            <!-- Main Content Area (Scrollable) -->
+            <main class="main-content flex-grow w-full overflow-y-auto">
+                <div class="p-4 md:p-8">
+                    <div id="dashboard" class="view"></div>
+                    <div id="logg-behandling" class="view"></div>
+                    <div id="historikk" class="view"></div>
+                </div>
             </main>
-
-            <!-- Mobile nav is now a natural part of the flex layout, not fixed -->
-            <nav id="mobile-nav" class="bg-panel-dark border-t border-border-dark p-1 md:hidden flex items-center justify-around flex-shrink-0">
-                <button id="mobile-nav-dashboard" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span>Dashboard</span>
-                </button>
-                <button id="mobile-nav-historikk" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
-                    <span>Historikk</span>
-                </button>
-                <button id="mobile-nav-new-session" class="mobile-nav-button flex-1 flex justify-center p-3 rounded-lg mx-2 bg-accent-yellow text-jet-black">
-                     <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <button id="mobile-logout-btn" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    <span>Logg ut</span>
-                </button>
-            </nav>
         </div>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav id="mobile-nav" class="bg-panel-dark border-t border-border-dark p-1 w-full z-10 md:hidden flex items-center justify-around flex-shrink-0">
+            <button id="mobile-nav-dashboard" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Dashboard</span>
+            </button>
+            <button id="mobile-nav-historikk" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                <span>Historikk</span>
+            </button>
+            <button id="mobile-nav-new-session" class="mobile-nav-button flex-1 flex justify-center p-3 rounded-lg mx-2 bg-accent-yellow text-jet-black">
+                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button id="mobile-logout-btn" class="mobile-nav-button flex-1 flex flex-col items-center justify-center p-2 rounded-lg text-xs gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Logg ut</span>
+            </button>
+        </nav>
     </div>
 
+    <!-- Modal Dialog -->
     <div id="modal-backdrop" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50">
         <div id="modal-content" class="bg-panel-dark rounded-2xl p-8 max-w-md w-full shadow-2xl border border-border-dark">
             <h2 id="modal-title" class="font-heading text-xl font-bold text-text-primary-dark mb-2">Bekreftelse</h2>
@@ -206,6 +219,7 @@
     </div>
 
     <script type="module">
+        // Firebase and app logic - no changes here, but included for completeness
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -235,14 +249,15 @@
         const appView = document.getElementById('app-view');
         const loginForm = document.getElementById('login-form');
         const authError = document.getElementById('auth-error');
+        const mainContent = document.querySelector('.main-content');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 loginView.style.display = 'none';
-                appView.style.display = 'flex';
-                document.documentElement.classList.add('no-scroll');
-                document.body.classList.add('no-scroll');
+                appView.style.display = 'flex'; // Use flex to enable layout
+                document.documentElement.classList.add('app-active');
+                document.body.classList.add('app-active');
                 showView('dashboard'); 
             } else {
                 currentUser = null;
@@ -252,8 +267,8 @@
                 }
                 loginView.style.display = 'grid';
                 appView.style.display = 'none';
-                document.documentElement.classList.remove('no-scroll');
-                document.body.classList.remove('no-scroll');
+                document.documentElement.classList.remove('app-active');
+                document.body.classList.remove('app-active');
             }
         });
         
@@ -357,6 +372,9 @@
             if (viewId === 'logg-behandling') prepareForm('logg-behandling');
             else if (viewId === 'dashboard') prepareForm('dashboard');
             else if (viewId === 'historikk') prepareForm('historikk');
+            
+            // Scroll to top of content area on view change
+            if(mainContent) mainContent.scrollTop = 0;
         };
         
         document.getElementById('nav-dashboard').addEventListener('click', () => showView('dashboard'));
@@ -368,24 +386,27 @@
         document.getElementById('mobile-nav-new-session').addEventListener('click', () => showView('logg-behandling'));
 
         function prepareForm(viewId) {
-            const container = document.getElementById(viewId);
+            const container = document.querySelector(`#${viewId}`);
             if (!container) return;
 
             if (viewId === 'dashboard') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-2">Dashboard</h1>
-                    <p class="text-body-s text-text-secondary-dark mb-8 hidden md:block">En oversikt over fremgang og innsikt.</p>
-                    <div id="dashboard-header" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"></div>
-                    <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>`;
+                        <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-2">Dashboard</h1>
+                        <p class="text-body-s text-text-secondary-dark mb-8 hidden md:block">En oversikt over fremgang og innsikt.</p>
+                        <div id="dashboard-header" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"></div>
+                        <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+                    `;
             } else if (viewId === 'logg-behandling') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Loggfør Ny Økt</h1>
-                    <form id="behandling-skjema" class="bg-panel-dark border border-border-dark p-4 md:p-8 rounded-2xl max-w-4xl mx-auto"></form>`;
+                        <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Loggfør Ny Økt</h1>
+                        <form id="behandling-skjema" class="bg-panel-dark border border-border-dark p-4 md:p-8 rounded-2xl max-w-4xl mx-auto"></form>
+                    `;
                 renderFormContent();
             } else if (viewId === 'historikk') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Økthistorikk</h1>
-                    <div id="historikk-liste" class="space-y-4"></div>`;
+                        <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Økthistorikk</h1>
+                        <div id="historikk-liste" class="space-y-4"></div>
+                    `;
             }
         }
 
@@ -486,14 +507,16 @@
             const bestStreak = Math.max(currentStreak, ...historicalStreaks, 0);
 
             container.innerHTML = `
-                <h3 class="font-heading text-title-m font-semibold mb-4">Migrenefri Rekke</h3>
-                <div class="flex justify-around items-end text-center mt-2">
-                    <div>
-                        <div class="font-heading text-display-l font-bold text-info-blue">${currentStreak}</div>
+                <h3 class="font-heading text-title-m font-semibold mb-2">Migrenefri Rekke</h3>
+                <div class="grid grid-cols-2 gap-4 items-center mt-4">
+                    <div class="text-center">
+                        <div class="font-heading text-5xl md:text-6xl font-bold text-info-blue">${currentStreak}</div>
                         <div class="text-body-s text-text-secondary-dark -mt-1">dager nå</div>
                     </div>
-                    <div class="pb-1">
-                        <div class="font-heading text-2xl font-bold text-success-green">${bestStreak}</div>
+                    <div class="relative text-center">
+                         <svg class="absolute inset-0 w-full h-full text-accent-yellow/10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M13 7h-2v6h2V7zm0 8h-2v2h2v-2z"/></svg>
+                        <svg class="absolute -top-2 -right-2 w-8 h-8 text-accent-yellow"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.285 2l-1.428 1.428L16 0l-2.857 3.428L10.286 2 9 3.428 5.714 0 3.428 2.286 2 1 0 3.428l2.286 2.286L1 8l2.286-1.714L5.571 9l1.429-1.285L8 11.143l3-2.857L14 11.143l1-2.857 2.857 2.857L20 9l-1.714-2.286L20.571 5l-1.428-1.714L22 1l-1.715 1zM4 12v10h16V12H4zm2 2h12v6H6v-6z"/></svg>
+                        <div class="font-heading text-4xl md:text-5xl font-bold text-success-green">${bestStreak}</div>
                         <div class="text-body-s text-text-secondary-dark -mt-1">rekord</div>
                     </div>
                 </div>`;
@@ -651,7 +674,8 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="w-full mt-10 bg-accent-yellow text-jet-black font-semibold py-4 rounded-lg hover:bg-accent-yellow-hover transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">Lagre Behandlingsøkt</button>`;
+                <button type="submit" class="w-full mt-10 bg-accent-yellow text-jet-black font-semibold py-4 rounded-lg hover:bg-accent-yellow-hover transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">Lagre Behandlingsøkt</button>
+            `;
             
             populateCheckboxes('focus_areas', FOCUS_AREAS);
             document.getElementById('date').valueAsDate = new Date();
@@ -770,7 +794,6 @@
             modal.text.textContent = text;
             modal.confirmBtn.textContent = confirmText;
             modal.cancelBtn.textContent = cancelText;
-
             modal.confirmBtn.className = `font-semibold py-2 px-5 rounded-lg transition-all ${confirmClass} hover:opacity-80`;
             modal.cancelBtn.classList.toggle('hidden', !showCancel);
 
