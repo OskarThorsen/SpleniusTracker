@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpleniusTracker v45 (Mobile UI)</title>
+    <title>SpleniusTracker v46 (Forced Mobile Sidebar)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,22 +86,6 @@
         Chart.defaults.color = '#A1A1A6';
         Chart.defaults.borderColor = '#2A2A2E';
         Chart.defaults.font.family = "Inter, sans-serif";
-
-        /* IMPROVEMENT: Responsive sidebar styles */
-        @media (max-width: 768px) {
-            #sidebar.collapsed {
-                width: 80px; /* Width for icon-only sidebar */
-            }
-            #sidebar.collapsed .sidebar-text, #sidebar.collapsed .sidebar-header-text {
-                display: none;
-            }
-            #sidebar.collapsed .nav-button, #sidebar.collapsed #sidebar-new-session-btn {
-                justify-content: center;
-            }
-             #sidebar.collapsed #logout-btn {
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body class="bg-jet-black text-text-primary-dark font-sans h-screen overflow-hidden">
@@ -142,55 +126,45 @@
     </div>
 
     <!-- Main App View -->
-    <div id="app-view" class="w-full h-full hidden md:flex">
-        <!-- IMPROVEMENT: Sidebar now responsive. Added ID 'sidebar' -->
-        <aside id="sidebar" class="bg-panel-dark w-64 md:w-64 p-4 flex flex-col flex-shrink-0 transition-all duration-300">
-            <div class="flex items-center gap-3 p-4">
+    <!-- IMPROVEMENT: Changed to 'flex' to force sidebar layout on mobile -->
+    <div id="app-view" class="w-full h-full hidden flex">
+        <!-- IMPROVEMENT: Sidebar now uses responsive width and hides text on mobile -->
+        <aside id="sidebar" class="bg-panel-dark w-20 md:w-64 p-4 flex flex-col flex-shrink-0 transition-all duration-300">
+            <div class="flex items-center justify-center md:justify-start gap-3 p-4">
                 <svg class="w-8 h-8 text-accent-yellow flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 12c-3 0-5.5 2.5-5.5 5.5"/><path d="M12 12c3 0 5.5-2.5 5.5-5.5"/></svg>
-                <span class="sidebar-header-text font-heading text-xl font-semibold text-text-primary-dark">SpleniusTracker</span>
+                <span class="sidebar-header-text font-heading text-xl font-semibold text-text-primary-dark hidden md:inline-block">SpleniusTracker</span>
             </div>
             
             <div class="mt-4 mb-4 px-2">
-                <button id="sidebar-new-session-btn" class="w-full flex items-center justify-center gap-2 bg-accent-yellow text-jet-black font-semibold py-3 px-4 rounded-lg hover:bg-accent-yellow-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel-dark focus:ring-accent-yellow transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">
+                <button id="sidebar-new-session-btn" class="w-full flex items-center justify-center md:justify-start gap-2 bg-accent-yellow text-jet-black font-semibold py-3 px-4 rounded-lg hover:bg-accent-yellow-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-panel-dark focus:ring-accent-yellow transition-all shadow-lg shadow-accent-yellow/10 hover:shadow-accent-yellow/20">
                     <svg class="w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span class="sidebar-text">Ny Økt</span>
+                    <span class="sidebar-text hidden md:inline-block">Ny Økt</span>
                 </button>
             </div>
 
             <nav class="flex flex-col gap-2 flex-grow px-2">
-                <button id="nav-dashboard" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
+                <button id="nav-dashboard" class="nav-button flex items-center justify-center md:justify-start gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    <span class="sidebar-text">Dashboard</span>
+                    <span class="sidebar-text hidden md:inline-block">Dashboard</span>
                 </button>
-                <button id="nav-historikk" class="nav-button flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
+                <button id="nav-historikk" class="nav-button flex items-center justify-center md:justify-start gap-3 w-full px-4 py-3 rounded-lg text-left text-base transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
-                    <span class="sidebar-text">Historikk</span>
+                    <span class="sidebar-text hidden md:inline-block">Historikk</span>
                 </button>
             </nav>
             <div class="p-2">
-                <button id="logout-btn" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg text-base text-text-secondary-dark hover:bg-alert-red/10 hover:text-alert-red transition-colors duration-200">
+                <button id="logout-btn" class="flex items-center justify-center md:justify-start gap-3 w-full px-4 py-3 rounded-lg text-base text-text-secondary-dark hover:bg-alert-red/10 hover:text-alert-red transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 flex-shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    <span class="sidebar-text">Logg ut</span>
+                    <span class="sidebar-text hidden md:inline-block">Logg ut</span>
                 </button>
             </div>
         </aside>
 
-        <div class="flex-grow flex flex-col">
-             <!-- IMPROVEMENT: Added mobile header with hamburger menu -->
-             <header class="md:hidden bg-panel-dark p-4 flex justify-between items-center">
-                 <h1 class="font-heading text-xl font-bold text-text-primary-dark">Dashboard</h1>
-                 <button id="menu-toggle-btn" class="p-2">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                     </svg>
-                 </button>
-             </header>
-            <main class="main-content flex-grow p-4 md:p-8 overflow-y-auto">
-                <div id="dashboard" class="view animate-fadeIn"></div>
-                <div id="logg-behandling" class="view animate-fadeIn"></div>
-                <div id="historikk" class="view animate-fadeIn"></div>
-            </main>
-        </div>
+        <main class="main-content flex-grow p-4 md:p-8 overflow-y-auto">
+            <div id="dashboard" class="view animate-fadeIn"></div>
+            <div id="logg-behandling" class="view animate-fadeIn"></div>
+            <div id="historikk" class="view animate-fadeIn"></div>
+        </main>
     </div>
 
     <!-- Reusable modal for confirmations -->
@@ -235,35 +209,12 @@
         const appView = document.getElementById('app-view');
         const loginForm = document.getElementById('login-form');
         const authError = document.getElementById('auth-error');
-        const sidebar = document.getElementById('sidebar');
-        const menuToggleBtn = document.getElementById('menu-toggle-btn');
-
-        // --- MOBILE SIDEBAR LOGIC ---
-        const setupMobileSidebar = () => {
-             if (window.innerWidth <= 768) {
-                sidebar.classList.add('collapsed');
-                appView.classList.remove('md:flex'); // Use flex for mobile layout
-                appView.classList.add('flex');
-            } else {
-                sidebar.classList.remove('collapsed');
-                appView.classList.add('md:flex');
-            }
-        };
-
-        menuToggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-
-        window.addEventListener('resize', setupMobileSidebar);
-        // --- END MOBILE SIDEBAR LOGIC ---
-
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 loginView.classList.add('hidden');
                 appView.classList.remove('hidden');
-                setupMobileSidebar(); // Setup sidebar on login
                 showView('dashboard'); 
             } else {
                 currentUser = null;
@@ -344,9 +295,8 @@
                 b.classList.remove('bg-accent-yellow', 'text-jet-black', 'font-semibold');
                 b.classList.add('text-text-secondary-dark');
             });
-            // Also reset new session button style
-             document.getElementById('sidebar-new-session-btn').classList.remove('ring-2', 'ring-offset-2', 'ring-accent-yellow');
-
+            
+            document.getElementById('sidebar-new-session-btn').classList.remove('ring-2', 'ring-offset-2', 'ring-accent-yellow');
 
             const activeNavButtonId = viewToNavButtonMap[viewId];
             if (activeNavButtonId) {
@@ -355,32 +305,15 @@
                     activeButton?.classList.add('bg-accent-yellow', 'text-jet-black', 'font-semibold');
                     activeButton?.classList.remove('text-text-secondary-dark');
                 } else {
-                    // Special style for the main CTA button if it's the active "view"
                     activeButton?.classList.add('ring-2', 'ring-offset-2', 'ring-offset-panel-dark', 'ring-accent-yellow');
                 }
             }
             
-            // Update mobile header text
-            const mobileHeader = document.querySelector('header h1');
-            if(mobileHeader) {
-                const viewTitles = {
-                    'dashboard': 'Dashboard',
-                    'historikk': 'Historikk',
-                    'logg-behandling': 'Ny Økt'
-                };
-                mobileHeader.textContent = viewTitles[viewId] || 'SpleniusTracker';
-            }
-
             if (currentUser) listenToBehandlinger();
 
             if (viewId === 'logg-behandling') prepareForm('logg-behandling');
             else if (viewId === 'dashboard') prepareForm('dashboard');
             else if (viewId === 'historikk') prepareForm('historikk');
-
-            // Collapse sidebar on mobile after navigation
-            if (window.innerWidth <= 768) {
-                sidebar.classList.add('collapsed');
-            }
         };
         
         document.getElementById('nav-dashboard').addEventListener('click', () => showView('dashboard'));
@@ -391,20 +324,21 @@
             const container = document.getElementById(viewId);
             if (!container) return;
 
+            // IMPROVEMENT: Restored titles on mobile with smaller font size
             if (viewId === 'dashboard') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-2 hidden md:block">Dashboard</h1>
-                    <p class="text-body-s text-text-secondary-dark mb-8 hidden md:block">En oversikt over fremgang og innsikt.</p>
+                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-2">Dashboard</h1>
+                    <p class="text-body-s text-text-secondary-dark mb-8">En oversikt over fremgang og innsikt.</p>
                     <div id="dashboard-header" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"></div>
                     <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>`;
             } else if (viewId === 'logg-behandling') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8 hidden md:block">Loggfør Ny Økt</h1>
+                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Loggfør Ny Økt</h1>
                     <form id="behandling-skjema" class="bg-panel-dark p-4 md:p-8 rounded-2xl max-w-4xl mx-auto"></form>`;
                 renderFormContent();
             } else if (viewId === 'historikk') {
                 container.innerHTML = `
-                    <h1 class="font-heading text-3xl font-bold text-text-primary-dark mb-8 hidden md:block">Økthistorikk</h1>
+                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-text-primary-dark mb-8">Økthistorikk</h1>
                     <div id="historikk-liste" class="space-y-4"></div>`;
             }
         }
